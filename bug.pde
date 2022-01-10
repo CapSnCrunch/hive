@@ -3,7 +3,7 @@ class Bug {
   int q, r, s;
   String team, type;
   
-  int scale = 100;
+  int scale = 75;
   PImage img;
   
   Bug (int q, int r, int s, String team, String type){

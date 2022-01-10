@@ -10,7 +10,7 @@ void setup(){
   Bug b2 = new Bug(2, 0, 0, "w", "spider");
   Bug b3 = new Bug(0, -1, 0, "w", "ladybug");
   Bug b4 = new Bug(-1, 0, 0, "b", "beetle");
-  Bug b5 = new Bug(0, 0, 1, "b", "mosquito");
+  Bug b5 = new Bug(-1, 1, 0, "b", "mosquito");
   
   game.addBug(q);
   game.addBug(q2);
@@ -19,12 +19,17 @@ void setup(){
   game.addBug(b3);
   game.addBug(b4);
   game.addBug(b5);
+  game.setScale(60);
 }
 
 void draw(){
   background(150, 140, 130);
   game.display();
-  game.highlight("w");
-  game.highlight("b");
-  game.setScale(75);
+  game.highlight();
+  game.getCurrentHoverPosition();
+}
+
+void mousePressed(){
+  
+
 }
