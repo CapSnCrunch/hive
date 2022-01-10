@@ -30,8 +30,6 @@ class Bug {
     this.q = q;
     this.r = r;
     this.s = s;
-    
-    println(this.scale);
 
     PVector Q = new PVector(1, 0).mult(scale);
     PVector R = new PVector(0.5, -sqrt(3)/2).mult(scale);
