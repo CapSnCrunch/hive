@@ -1,6 +1,6 @@
 class Game {
   int size = 10;
-  int scale = 75;
+  int scale = 60;
   Bug[][] grid = new Bug[this.size][this.size];
   Bug[] whiteBugs = new Bug[0];
   Bug[] blackBugs = new Bug[0];
@@ -69,7 +69,6 @@ class Game {
     } else if (i-1 >= 0 && j-1 >= 0 && i+1 < this.size && j+1 < this.size){
       if (this.grid[i-1][j] != null || this.grid[i+1][j] != null || this.grid[i][j-1] != null || this.grid[i][j+1] != null || this.grid[i+1][j-1] != null || this.grid[i-1][j+1] != null){
         PImage emptyTile = loadImage("bugs/empty.png");
-        tint(255, 200);
         emptyTile.resize(0, int(this.scale));
         image(emptyTile, highlightPosition.x, highlightPosition.y);
       }

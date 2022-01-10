@@ -27,11 +27,15 @@ void setup(){
 void draw(){
   background(150, 140, 130);
   game.display();
-  //game.highlight();
-  game.getCurrentHoverPosition();
+  game.setScale(60);
 }
 
 void mousePressed(){
-  
-
+  int[] currentHoverPosition = game.getCurrentHoverPosition();
+  int i = currentHoverPosition[0];
+  int j = currentHoverPosition[1];
+  if (game.grid[i][j] == null){
+    Bug b = new Bug(i-3, j-3, "w", "ant");
+    game.addBug(b);
+  }
 }
