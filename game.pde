@@ -2,10 +2,11 @@ class Game {
   int size = 3;
   int scale = 60;
   int offset = 1;
+  PVector center = new PVector(width/2, height/2);
   Bug[][] grid = new Bug[this.size][this.size];
   
-  int turn = 0;
-  Player[] players = {new Player(), new Player()};
+  int turn = 1;
+  Player[] players = {new Player("w"), new Player("b")};
   
   Game(){
   }
@@ -15,13 +16,13 @@ class Game {
     for(int i = 0; i < this.size; i++){
       for(int j = 0; j < this.size; j++){
         if(this.grid[i][j] != null){
-          this.grid[i][j].display(i - this.offset, j - this.offset, this.scale);
+          this.grid[i][j].display(this.center, i - this.offset, j - this.offset, this.scale);
         } else if (this.hasNeighbor(i, j)){
           PVector Q = new PVector(1, 0).mult(this.scale);
           PVector R = new PVector(0.5, -sqrt(3)/2).mult(this.scale);
           PImage emptyTile = loadImage("bugs/empty.png");
           emptyTile.resize(0, int(this.scale));
-          image(emptyTile, Q.x * (i-this.offset) + R.x * (j-this.offset) + width/2, Q.y * (i-this.offset) + R.y * (j-this.offset) + height/2);
+          image(emptyTile, Q.x * (i-this.offset) + R.x * (j-this.offset) + this.center.x, Q.y * (i-this.offset) + R.y * (j-this.offset) + this.center.y);
         }
       }
     }
@@ -32,7 +33,7 @@ class Game {
     PVector R = new PVector(0.5, -sqrt(3)/2).mult(this.scale);
     for(int i = 0; i < this.size; i++){
       for(int j = 0; j < this.size; j++){
-        PVector cellPosition = new PVector(width/2, height/2);
+        PVector cellPosition = this.center.copy();
         if(dist(mouseX, mouseY, cellPosition.x + Q.x*(i-this.offset) + R.x*(j-this.offset), cellPosition.y + Q.y*(i-this.offset) + R.y*(j-this.offset)) < this.scale/2){
           int[] hoverPosition = {i, j};
           return hoverPosition;
@@ -51,7 +52,7 @@ class Game {
     PVector Q = new PVector(1, 0).mult(this.scale);
     PVector R = new PVector(0.5, -sqrt(3)/2).mult(this.scale);
   
-    PVector highlightPosition = new PVector(width/2, height/2);
+    PVector highlightPosition = this.center.copy();
     highlightPosition = highlightPosition.add(Q.mult(i - this.offset));
     highlightPosition = highlightPosition.add(R.mult(j - this.offset));
     
@@ -115,7 +116,7 @@ class Game {
   }
   
   void addBug(Bug bug, int q, int r){
-    println("adding bug at", q+this.offset, r+this.offset);
+    //println("adding bug at", q+this.offset, r+this.offset);
     this.grid[q + this.offset][r + this.offset] = bug;
     if (q + this.offset == 0 || r + this.offset == 0 || q + this.offset + 1 == this.size || r + this.offset + 1 == this.size){
       Bug[][] tempGrid = new Bug[this.size + 2][this.size + 2];
