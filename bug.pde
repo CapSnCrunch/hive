@@ -15,3 +15,4 @@ class Bug {
     image(img, Q.x * q + R.x * r + center.x, Q.y * q + R.y * r + center.y);
   }
 }
+    
