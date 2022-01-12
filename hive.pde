@@ -5,8 +5,6 @@ void setup(){
   size(550, 600);
   imageMode(CENTER);
   noStroke();
-  Bug b = new Bug("w", "queen");
-  game.addBug(b, 0, 0);
   
   game.center = new PVector(width/2, (height+100)/2);
 }
@@ -18,10 +16,14 @@ void draw(){
 }
 
 void mousePressed(){
-  initialPress = new PVector(mouseX, mouseY);
+  if (game.totalTurns > 0 && mouseY > 120){
+    initialPress = new PVector(mouseX, mouseY);
+  }
 }
 
 void mouseDragged(){
-  game.center = new PVector(game.center.x + mouseX - initialPress.x, game.center.y + mouseY - initialPress.y);
-  initialPress = new PVector(mouseX, mouseY);
+  if (game.totalTurns > 0 && mouseY > 120){
+    game.center = new PVector(game.center.x + mouseX - initialPress.x, game.center.y + mouseY - initialPress.y);
+    initialPress = new PVector(mouseX, mouseY);
+  }
 }

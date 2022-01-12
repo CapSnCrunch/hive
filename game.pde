@@ -10,11 +10,27 @@ class Game {
   Player[] players = {new Player("w"), new Player("b")};
   
   PVector menuHighlightPosition = new PVector(-50, -50);
+  String menuHighlightBug = "queen";
   
   Game(){
   }
   
   void display(){
+    // Show starter text
+    if (this.totalTurns < 1){
+      fill(30);
+      PFont font = createFont("Bell MT Bold", 20);
+      textFont(font);
+      text("Place a bug here to start the game", 130, 300);
+      
+      PImage emptyTile = loadImage("bugs/empty.png");
+      emptyTile.resize(0, int(this.scale));
+      image(emptyTile, this.center.x, this.center.y);
+      if (dist(mouseX, mouseY, this.center.x, this.center.y) < this.scale/2){
+        image(emptyTile, this.center.x, this.center.y);
+      }
+    }
+    
     // Show currently highlighted tile
     highlightHoveredTile();
     
@@ -37,6 +53,10 @@ class Game {
     fill(120, 110, 100);
     rect(0, 0, width, 130);
     
+    PImage menuHighlight = loadImage("bugs/empty.png");
+    menuHighlight.resize(0, 80);
+    image(menuHighlight, this.menuHighlightPosition.x, this.menuHighlightPosition.y);
+    
     PImage queen = loadImage("bugs/"+this.players[this.playerTurn].team+"-queen.png");
     PImage ant = loadImage("bugs/"+this.players[this.playerTurn].team+"-ant.png");
     PImage spider = loadImage("bugs/"+this.players[this.playerTurn].team+"-spider.png");
@@ -46,14 +66,14 @@ class Game {
     PImage pillbug = loadImage("bugs/"+this.players[this.playerTurn].team+"-pillbug.png");
     PImage mosquito = loadImage("bugs/"+this.players[this.playerTurn].team+"-mosquito.png");
     
-    queen.resize(0, 60);
-    ant.resize(0, 60);
-    spider.resize(0, 60);
-    beetle.resize(0, 60);
-    hopper.resize(0, 60);
-    ladybug.resize(0, 60);
-    pillbug.resize(0, 60);
-    mosquito.resize(0, 60);
+    queen.resize(0, 50);
+    ant.resize(0, 50);
+    spider.resize(0, 50);
+    beetle.resize(0, 50);
+    hopper.resize(0, 50);
+    ladybug.resize(0, 50);
+    pillbug.resize(0, 50);
+    mosquito.resize(0, 50);
     
     fill(30);
     PFont font = createFont("Bell MT Bold", 30);
@@ -61,23 +81,23 @@ class Game {
     
     image(queen, 40, 90);
     image(ant, 70, 40);
-    text("x " + str(this.players[this.playerTurn].queens), 85, 95);
-    text("x " + str(this.players[this.playerTurn].ants), 115, 45);
+    text("x " + str(this.players[this.playerTurn].bugCounts.get("queen")), 85, 95);
+    text("x " + str(this.players[this.playerTurn].bugCounts.get("ant")), 115, 45);
     
     image(spider, 170, 90);
     image(beetle, 200, 40);
-    text("x " + str(this.players[this.playerTurn].spiders), 215, 95);
-    text("x " + str(this.players[this.playerTurn].beetles), 245, 45);
+    text("x " + str(this.players[this.playerTurn].bugCounts.get("spider")), 215, 95);
+    text("x " + str(this.players[this.playerTurn].bugCounts.get("beetle")), 245, 45);
     
     image(hopper, 300, 90);
     image(ladybug, 330, 40);
-    text("x " + str(this.players[this.playerTurn].hoppers), 345, 95);
-    text("x " + str(this.players[this.playerTurn].ladybugs), 375, 45);
+    text("x " + str(this.players[this.playerTurn].bugCounts.get("hopper")), 345, 95);
+    text("x " + str(this.players[this.playerTurn].bugCounts.get("ladybug")), 375, 45);
     
     image(pillbug, 440, 90);
     image(mosquito, 470, 40);
-    text("x " + str(this.players[this.playerTurn].pillbugs), 475, 95);
-    text("x " + str(this.players[this.playerTurn].mosquitos), 505, 45);
+    text("x " + str(this.players[this.playerTurn].bugCounts.get("pillbug")), 475, 95);
+    text("x " + str(this.players[this.playerTurn].bugCounts.get("mosquito")), 505, 45);
   }
   
   int[] getCurrentHoverPosition(){
@@ -157,25 +177,63 @@ class Game {
   }
   
   void checkForActions(){
+    // Check if current bug highlight has no remaining bugs
+    if (game.players[game.playerTurn].bugCounts.get(this.menuHighlightBug) == 0){
+      menuHighlightPosition = new PVector(-50, -50);
+    }
+    
+    // Check for menu highlight change, bug placement, etc.
     if (mousePressed == true){
       int[] currentHoverPosition = game.getCurrentHoverPosition();
       int i = currentHoverPosition[0];
       int j = currentHoverPosition[1];
+      
+      // Check for menu highlight change
       if (mouseY < 120){
-        if (dist(mouseX, mouseY, 40, 90) < 60){ this.menuHighlightPosition = new PVector(40, 90); }
-        if (dist(mouseX, mouseY, 70, 40) < 60){ this.menuHighlightPosition = new PVector(70, 40); }
-        if (dist(mouseX, mouseY, 170, 90) < 60){ this.menuHighlightPosition = new PVector(170, 90); }
-        if (dist(mouseX, mouseY, 200, 40) < 60){ this.menuHighlightPosition = new PVector(200, 40); }
-        if (dist(mouseX, mouseY, 300, 90) < 60){ this.menuHighlightPosition = new PVector(300, 90); }
-        if (dist(mouseX, mouseY, 330, 40) < 60){ this.menuHighlightPosition = new PVector(330, 40); }
-        if (dist(mouseX, mouseY, 440, 90) < 60){ this.menuHighlightPosition = new PVector(440, 90); }
-        if (dist(mouseX, mouseY, 470, 40) < 60){ this.menuHighlightPosition = new PVector(470, 40); }
-      } else if (this.grid[i][j] == null && (this.hasValidNeighbor(i, j, this.players[this.playerTurn].team) || this.totalTurns < 2)){
-        if (this.totalTurns > 0 || (150 < mouseX && mouseX < 350 && 150 < mouseY && mouseY < 350)){
-          Bug b = new Bug(game.players[game.playerTurn].team, "ant");
-          game.playerTurn = (game.playerTurn + 1) % game.players.length;
-          game.addBug(b, i-game.offset, j-game.offset);
-          this.totalTurns += 1;
+        if (dist(mouseX, mouseY, 40, 90) < 30){
+          this.menuHighlightPosition = new PVector(40, 90);
+          this.menuHighlightBug = "queen";
+        }
+        if (dist(mouseX, mouseY, 70, 40) < 30){
+          this.menuHighlightPosition = new PVector(70, 40);
+          this.menuHighlightBug = "ant";
+        }
+        if (dist(mouseX, mouseY, 170, 90) < 30){
+          this.menuHighlightPosition = new PVector(170, 90);
+          this.menuHighlightBug = "spider";
+        }
+        if (dist(mouseX, mouseY, 200, 40) < 30){
+          this.menuHighlightPosition = new PVector(200, 40);
+          this.menuHighlightBug = "beetle";
+        }
+        if (dist(mouseX, mouseY, 300, 90) < 30){
+          this.menuHighlightPosition = new PVector(300, 90);
+          this.menuHighlightBug = "hopper";
+        }
+        if (dist(mouseX, mouseY, 330, 40) < 30){
+          this.menuHighlightPosition = new PVector(330, 40);
+          this.menuHighlightBug = "ladybug";
+        }
+        if (dist(mouseX, mouseY, 440, 90) < 30){
+          this.menuHighlightPosition = new PVector(440, 90);
+          this.menuHighlightBug = "pillbug";
+        }
+        if (dist(mouseX, mouseY, 470, 40) < 30){
+          this.menuHighlightPosition = new PVector(470, 40);
+          this.menuHighlightBug = "mosquito";
+        }
+      } else {
+        // Check if bug is being placed in an empty tile with valid neighbors (or if first bug is being placed for a player)
+        if (this.grid[i][j] == null && (this.hasValidNeighbor(i, j, this.players[this.playerTurn].team) || this.totalTurns < 2)){
+          if (this.totalTurns > 0 || dist(mouseX, mouseY, this.center.x, this.center.y) < this.scale/2){
+            if (game.players[game.playerTurn].bugCounts.get(this.menuHighlightBug) > 0){
+              Bug b = new Bug(game.players[game.playerTurn].team, this.menuHighlightBug);
+              game.players[game.playerTurn].bugCounts.sub(this.menuHighlightBug, 1);
+              game.playerTurn = (game.playerTurn + 1) % game.players.length;
+              game.addBug(b, i-game.offset, j-game.offset);
+              this.totalTurns += 1;
+            }
+          }
         }
       }
     }

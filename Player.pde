@@ -1,17 +1,10 @@
 class Player {
   String team;
   
-  int queens = 1;
+  String[] bugs = new String[]{"queen", "ant", "spider", "beetle", "hopper", "ladybug", "pillbug", "mosquito"};
+  int[] counts = new int[]{1, 3, 3, 2, 2, 1, 1, 1};
+  IntDict bugCounts = new IntDict(bugs, counts);
   
-  int ants = 3;
-  int spiders = 3;
-  
-  int beetles = 2;
-  int hoppers = 2;
-  
-  int ladybugs = 1;
-  int pillbugs = 1;
-  int mosquitos = 1;
   
   Player(String team){
     this.team = team;
