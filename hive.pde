@@ -27,3 +27,20 @@ void mouseDragged(){
     initialPress = new PVector(mouseX, mouseY);
   }
 }
+
+float easeFunction(float x, float a, float b, float c, float d){
+  return d / (1 + exp(-c*(x-a))) + d / (1 + exp(-c*(x-b)));
+};
+
+void mouseWheel(MouseEvent event){
+  
+  // Positive when scrolling up, negative when scrolling down
+  float e = event.getCount();
+  println(e, game.scale);
+  if (e > 0 && game.scale > 30){
+    game.scale -= easeFunction(game.scale, 30, 100, 0.2, 2);
+  }
+  if (e < 0 && game.scale < 100){
+    game.scale += easeFunction(game.scale, 30, 100, 0.2, 2);
+  }
+}

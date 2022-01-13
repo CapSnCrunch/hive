@@ -1,6 +1,8 @@
 class Game {
-  int size = 3;
   int scale = 60;
+  float angle = 0;
+  
+  int size = 3;
   int offset = 1;
   PVector center = new PVector(width/2, height/2);
   Bug[][] grid = new Bug[this.size][this.size];
@@ -38,7 +40,7 @@ class Game {
     for(int i = 0; i < this.size; i++){
       for(int j = 0; j < this.size; j++){
         if(this.grid[i][j] != null){
-          this.grid[i][j].display(this.center, i - this.offset, j - this.offset, this.scale);
+          this.grid[i][j].display(this.center, i - this.offset, j - this.offset, this.scale, this.angle);
         } else if (this.hasNeighbor(i, j)){
           PVector Q = new PVector(1, 0).mult(this.scale);
           PVector R = new PVector(0.5, -sqrt(3)/2).mult(this.scale);
@@ -131,13 +133,23 @@ class Game {
     if(this.grid[i][j] != null){
       // Display highlight ring around bug
       PImage ring = loadImage("bugs/ring.png");
+      pushMatrix();
+      translate(highlightPosition.x, highlightPosition.y);
+      rotate(this.angle);
+      translate(-highlightPosition.x, -highlightPosition.y);
       ring.resize(0, int(this.scale*1.22));
       image(ring, highlightPosition.x, highlightPosition.y);
+      popMatrix();
     } else if (hasNeighbor(i, j)){
       // Display highlighted empty tile
       PImage emptyTile = loadImage("bugs/empty.png");
+      pushMatrix();
+      translate(highlightPosition.x, highlightPosition.y);
+      rotate(this.angle);
+      translate(-highlightPosition.x, -highlightPosition.y);
       emptyTile.resize(0, int(this.scale));
       image(emptyTile, highlightPosition.x, highlightPosition.y);
+      popMatrix();
     }
   }
   
@@ -166,14 +178,17 @@ class Game {
   
   boolean hasValidNeighbor(int i, int j, String team){
     Bug[] neighbors = this.getNeighbors(i, j);
+    boolean hasTeamNeighbor = false;
     for (int k = 0; k < 6; k++){
       if (neighbors[k] != null){
-        if (neighbors[k].team == team){
-          return true;
+        if (neighbors[k].team != team){
+          return false;
+        } else {
+          hasTeamNeighbor = true;
         }
       }
     }
-    return false;
+    return hasTeamNeighbor;
   }
   
   void checkForActions(){
