@@ -14,6 +14,8 @@ class Game {
   PVector menuHighlightPosition = new PVector(-50, -50);
   String menuHighlightBug = "queen";
   
+  int[] currentBug = null;
+  
   Game(){
   }
   
@@ -34,7 +36,11 @@ class Game {
     }
     
     // Show currently highlighted tile
-    highlightHoveredTile();
+    if (this.currentBug == null){
+      highlightHoveredTile();
+    } else {
+      highlightSelectedTile();
+    }
     
     // Show bug tiles and empty tiles
     for(int i = 0; i < this.size; i++){
@@ -153,6 +159,25 @@ class Game {
     }
   }
   
+  void highlightSelectedTile(){
+    PVector Q = new PVector(1, 0).mult(this.scale);
+    PVector R = new PVector(0.5, -sqrt(3)/2).mult(this.scale);
+    
+    PVector highlightPosition = this.center.copy();
+    highlightPosition = highlightPosition.add(Q.mult(this.currentBug[0] - this.offset));
+    highlightPosition = highlightPosition.add(R.mult(this.currentBug[1] - this.offset));
+    
+    // Display highlight ring around selected bug
+    PImage ring = loadImage("bugs/ring.png");
+    pushMatrix();
+    translate(highlightPosition.x, highlightPosition.y);
+    rotate(this.angle);
+    translate(-highlightPosition.x, -highlightPosition.y);
+    ring.resize(0, int(this.scale*1.22));
+    image(ring, highlightPosition.x, highlightPosition.y);
+    popMatrix();
+  }
+  
   Bug[] getNeighbors(int i, int j){
     Bug[] neighbors = new Bug[6];
     
@@ -181,7 +206,9 @@ class Game {
     boolean hasTeamNeighbor = false;
     for (int k = 0; k < 6; k++){
       if (neighbors[k] != null){
-        if (neighbors[k].team != team){
+        if (team == "any"){
+          return true;
+        } else if (neighbors[k].team != team){
           return false;
         } else {
           hasTeamNeighbor = true;
@@ -205,6 +232,7 @@ class Game {
       
       // Check for menu highlight change
       if (mouseY < 120){
+        this.currentBug = null;
         if (dist(mouseX, mouseY, 40, 90) < 30){
           this.menuHighlightPosition = new PVector(40, 90);
           this.menuHighlightBug = "queen";
@@ -238,18 +266,37 @@ class Game {
           this.menuHighlightBug = "mosquito";
         }
       } else {
-        // Check if bug is being placed in an empty tile with valid neighbors (or if first bug is being placed for a player)
-        if (this.grid[i][j] == null && (this.hasValidNeighbor(i, j, this.players[this.playerTurn].team) || this.totalTurns < 2)){
-          if (this.totalTurns > 0 || dist(mouseX, mouseY, this.center.x, this.center.y) < this.scale/2){
-            if (game.players[game.playerTurn].bugCounts.get(this.menuHighlightBug) > 0){
-              Bug b = new Bug(game.players[game.playerTurn].team, this.menuHighlightBug);
-              game.players[game.playerTurn].bugCounts.sub(this.menuHighlightBug, 1);
-              game.playerTurn = (game.playerTurn + 1) % game.players.length;
-              game.addBug(b, i-game.offset, j-game.offset);
-              this.totalTurns += 1;
+        // Check if empty tile is selected
+        if (this.grid[i][j] == null){
+          // Check if we need to place a new bug or move a selected bug
+          if (currentBug == null){
+            // Check if bug is being placed in an empty tile with valid neighbors (or if first bug is being placed for a player)
+            if (this.hasValidNeighbor(i, j, this.players[this.playerTurn].team) || this.totalTurns < 2){
+              if (dist(mouseX, mouseY, this.center.x, this.center.y) < this.scale/2 || this.totalTurns > 0){
+                if (game.players[game.playerTurn].bugCounts.get(this.menuHighlightBug) > 0){
+                  Bug b = new Bug(game.players[game.playerTurn].team, this.menuHighlightBug);
+                  game.players[game.playerTurn].bugCounts.sub(this.menuHighlightBug, 1);
+                  game.addBug(b, i-game.offset, j-game.offset);
+                  
+                  this.turnCleanup();
+                }
+              }
             }
+            // Check if selected bug is being moved
+          } else if (this.currentBug != null && (this.hasValidNeighbor(i, j, "any"))){
+            this.grid[i][j] = this.grid[this.currentBug[0]][this.currentBug[1]];
+            this.grid[this.currentBug[0]][this.currentBug[1]] = null;
+              
+            this.turnCleanup();
           }
-        }
+          // Deselect current bug if clicking elsewhere
+        } else if (this.grid[i][j] != null){
+          //Check if a bug owned by the current player is being selected
+          if (this.grid[i][j].team == this.players[this.playerTurn].team){
+            this.currentBug = new int[] {i, j};
+            this.menuHighlightPosition = new PVector(-50, -50);
+          }
+        } 
       }
     }
   }
@@ -268,5 +315,11 @@ class Game {
       this.size = this.size + 2;
       this.offset += 1;
     }
+  }
+  
+  void turnCleanup(){
+    this.totalTurns += 1;
+    this.playerTurn = (this.playerTurn + 1) % this.players.length;
+    this.currentBug = null;
   }
 }
