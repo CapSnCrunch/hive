@@ -15,6 +15,7 @@ class Game {
   String menuHighlightBug = "queen";
   
   int[] currentBug = null;
+  int[][] currentBugValidMoves = null;
   
   Game(){
   }
@@ -265,13 +266,14 @@ class Game {
           this.menuHighlightPosition = new PVector(470, 40);
           this.menuHighlightBug = "mosquito";
         }
+        // Clicking somewhere other than the menu
       } else {
         // Check if empty tile is selected
         if (this.grid[i][j] == null){
           // Check if we need to place a new bug or move a selected bug
           if (currentBug == null){
             // Check if bug is being placed in an empty tile with valid neighbors (or if first bug is being placed for a player)
-            if (this.hasValidNeighbor(i, j, this.players[this.playerTurn].team) || this.totalTurns < 2){
+            if (this.hasValidNeighbor(i, j, this.players[this.playerTurn].team) || this.totalTurns == 0 || (this.totalTurns == 1 && this.hasNeighbor(i,j))){
               if (dist(mouseX, mouseY, this.center.x, this.center.y) < this.scale/2 || this.totalTurns > 0){
                 if (game.players[game.playerTurn].bugCounts.get(this.menuHighlightBug) > 0){
                   Bug b = new Bug(game.players[game.playerTurn].team, this.menuHighlightBug);
@@ -295,8 +297,64 @@ class Game {
           if (this.grid[i][j].team == this.players[this.playerTurn].team){
             this.currentBug = new int[] {i, j};
             this.menuHighlightPosition = new PVector(-50, -50);
+            
+            println(grid[i][j].name);
+            
+            if (grid[i][j].name == "ant"){
+              this.currentBugValidMoves = getAntMoves(i, j);
+              for(int p = 0; p < this.currentBugValidMoves.length; p++){
+                print(this.currentBugValidMoves[p][0], this.currentBugValidMoves[p][1]);
+              }
+            }
           }
         } 
+      }
+    }
+  }
+  
+  int[][] getAntMoves(int i, int j){
+    int[][] moves = new int[1][2];
+    int[] currentPosition = {i, j};
+    int[][] neighborRelativeIndecies = {{1, 0}, {1, -1}, {0, -1}, {-1, 0}, {-1, 1}, {0, 1}};
+    
+    while (true) {
+      // Check if any neighbors are valid
+      int[] validMove = null;
+      for (int n = 0; n < 6; n++){
+        
+        int di = neighborRelativeIndecies[mod(n-1,6)][0];
+        int dj = neighborRelativeIndecies[mod(n-1,6)][1];
+        Bug neighborsRightNeighbor = grid[currentPosition[0]+di][currentPosition[1]+dj];
+        
+        int di2 = neighborRelativeIndecies[n][0];
+        int dj2 = neighborRelativeIndecies[n][1];
+        Bug neighbor = grid[currentPosition[0]+di2][currentPosition[1]+dj2];
+        
+        int di3 = neighborRelativeIndecies[mod(n+1,6)][0];
+        int dj3 = neighborRelativeIndecies[mod(n+1,6)][1];
+        Bug neighborsLeftNeighbor = grid[currentPosition[0]+di3][currentPosition[1]+dj3];
+        
+        // Check if neighbor is valid (empty, corresponding sides have exactly one neighbor, and not already in moves)
+        if (neighbor == null && xor(neighborsLeftNeighbor == null, neighborsRightNeighbor == null)){
+          int[] potentialMove = {currentPosition[0]+di2, currentPosition[0]+di2};
+          if (indeciesInArray(potentialMove, moves)){
+            validMove = potentialMove;
+          }
+        }
+      }
+      if (validMove != null){
+        // Add valid move to the list of moves
+        int[][] tempMoves = new int[moves.length+1][2];
+        for (int m = 0; m < moves.length; m++){
+          tempMoves[m] = moves[m];
+        }
+        tempMoves[moves.length+1] = validMove;
+        moves = tempMoves;
+        
+        // Update current position to the newly added move
+        currentPosition = validMove;
+      } else {
+        return moves;
       }
     }
   }
@@ -321,5 +379,6 @@ class Game {
     this.totalTurns += 1;
     this.playerTurn = (this.playerTurn + 1) % this.players.length;
     this.currentBug = null;
+    this.currentBugValidMoves = null;
   }
 }

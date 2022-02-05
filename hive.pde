@@ -28,6 +28,23 @@ void mouseDragged(){
   }
 }
 
+int mod(int a, int b){
+  return (a%b + b) % b;
+}
+
+boolean xor(boolean a, boolean b){
+  return ((a && !b) || (!a && b));
+}
+
+boolean indeciesInArray(int[] indecies, int[][] array){
+  for (int i = 0; i < array.length; i++){
+    if (indecies[0] == array[i][0] && indecies[1] == array[i][1]){
+      return true;
+    }
+  }
+  return false;
+}
+
 float easeFunction(float x, float a, float b, float c, float d){
   return d / (1 + exp(-c*(x-a))) + d / (1 + exp(-c*(x-b)));
 };
