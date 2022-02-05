@@ -359,6 +359,34 @@ class Game {
     }
   }
   
+  int[][] getQueenMoves(int i, int j){
+    return null;
+  }
+  
+  int[][] getSpiderMoves(int i, int j){
+    return null;
+  }
+  
+  int[][] getBeetleMoves(int i, int j){
+    return null;
+  }
+  
+  int[][] getHopperMoves(int i, int j){
+    return null;
+  }
+  
+  int[][] getLadybugMoves(int i, int j){
+    return null;
+  }
+  
+  int[][] getPillbugMoves(int i, int j){
+    return null;
+  }
+  
+  int[][] getMosquitoMoves(int i, int j){
+    return null;
+  }
+  
   void addBug(Bug bug, int q, int r){
     //println("adding bug at", q+this.offset, r+this.offset);
     this.grid[q + this.offset][r + this.offset] = bug;
