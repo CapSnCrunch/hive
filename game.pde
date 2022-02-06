@@ -107,6 +107,12 @@ class Game {
     image(mosquito, 470, 40);
     text("x " + str(this.players[this.playerTurn].bugCounts.get("pillbug")), 475, 95);
     text("x " + str(this.players[this.playerTurn].bugCounts.get("mosquito")), 505, 45);
+    
+    // DEBUG TOOL
+    int[] currentHoverPosition = game.getCurrentHoverPosition();
+    int i = currentHoverPosition[0];
+    int j = currentHoverPosition[1];
+    text(str(i) + " " + str(j), 50, 200);
   }
   
   int[] getCurrentHoverPosition(){
@@ -302,8 +308,9 @@ class Game {
             
             if (grid[i][j].name == "ant"){
               this.currentBugValidMoves = getAntMoves(i, j);
+              println("VALID MOVES");
               for(int p = 0; p < this.currentBugValidMoves.length; p++){
-                print(this.currentBugValidMoves[p][0], this.currentBugValidMoves[p][1]);
+                println(this.currentBugValidMoves[p][0], this.currentBugValidMoves[p][1]);
               }
             }
           }
@@ -313,9 +320,15 @@ class Game {
   }
   
   int[][] getAntMoves(int i, int j){
-    int[][] moves = new int[1][2];
+    int[][] moves = new int[0][0];
     int[] currentPosition = {i, j};
-    int[][] neighborRelativeIndecies = {{1, 0}, {1, -1}, {0, -1}, {-1, 0}, {-1, 1}, {0, 1}};
+    int[][] neighborRelativeIndecies = {{0, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, 0}, {-1, 1}};
+    
+    println("CURRENT POSITION", currentPosition[0], currentPosition[1]);
+    
+    // Temporarily remove selected bug
+    Bug bugHolder = this.grid[i][j];
+    this.grid[i][j] = null;
     
     while (true) {
       // Check if any neighbors are valid
@@ -334,26 +347,55 @@ class Game {
         int dj3 = neighborRelativeIndecies[mod(n+1,6)][1];
         Bug neighborsLeftNeighbor = grid[currentPosition[0]+di3][currentPosition[1]+dj3];
         
+        // DEBUG TOOL
+        //println(" checking n =", n);
+        //if (neighborsRightNeighbor != null){
+        //  println("    right  ", currentPosition[0]+di, currentPosition[1]+dj, neighborsRightNeighbor.name);
+        //} else {
+        //  println("    right  ", currentPosition[0]+di, currentPosition[1]+dj, "null");
+        //}
+        
+        //if (neighbor != null){
+        //  println("    middle ", currentPosition[0]+di2, currentPosition[1]+dj2, neighbor.name);
+        //} else {
+        //  println("    middle ", currentPosition[0]+di2, currentPosition[1]+dj2, "null");
+        //}
+        
+        //if (neighborsLeftNeighbor != null){
+        //  println("    left   ", currentPosition[0]+di3, currentPosition[1]+dj3, neighborsLeftNeighbor.name);
+        //} else {
+        //  println("    left   ", currentPosition[0]+di3, currentPosition[1]+dj3, "null");
+        //}
+        
         // Check if neighbor is valid (empty, corresponding sides have exactly one neighbor, and not already in moves)
         if (neighbor == null && xor(neighborsLeftNeighbor == null, neighborsRightNeighbor == null)){
-          int[] potentialMove = {currentPosition[0]+di2, currentPosition[0]+di2};
-          if (indeciesInArray(potentialMove, moves)){
+          int[] potentialMove = {currentPosition[0]+di2, currentPosition[1]+dj2};
+          println("POTENTIAL MOVE FOUND", potentialMove[0], potentialMove[1]);
+          if (!indeciesInArray(potentialMove, moves)){
             validMove = potentialMove;
           }
         }
       }
+      
       if (validMove != null){
         // Add valid move to the list of moves
         int[][] tempMoves = new int[moves.length+1][2];
         for (int m = 0; m < moves.length; m++){
           tempMoves[m] = moves[m];
         }
-        tempMoves[moves.length+1] = validMove;
+        tempMoves[moves.length] = validMove;
         moves = tempMoves;
+        
+        //println("NEW MOVE LIST");
+        //for(int m = 0; m < tempMoves.length; m++){
+        //  print("  ", tempMoves[m][0], tempMoves[m][1], " : ");
+        //}
+        //println();
         
         // Update current position to the newly added move
         currentPosition = validMove;
       } else {
+        this.grid[i][j] = bugHolder;
         return moves;
       }
     }
