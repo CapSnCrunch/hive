@@ -337,47 +337,59 @@ class Game {
         
         int di = neighborRelativeIndecies[mod(n-1,6)][0];
         int dj = neighborRelativeIndecies[mod(n-1,6)][1];
-        Bug neighborsRightNeighbor = grid[currentPosition[0]+di][currentPosition[1]+dj];
+        Bug neighborsRightNeighbor = null;
+        if (currentPosition[0]+di >= 0 && currentPosition[0]+di < grid.length && currentPosition[1]+dj >= 0 && currentPosition[1]+dj < grid.length){
+          neighborsRightNeighbor = grid[currentPosition[0]+di][currentPosition[1]+dj];
+        }
         
         int di2 = neighborRelativeIndecies[n][0];
         int dj2 = neighborRelativeIndecies[n][1];
-        Bug neighbor = grid[currentPosition[0]+di2][currentPosition[1]+dj2];
+        Bug neighbor = null;
+        if (currentPosition[0]+di2 >= 0 && currentPosition[0]+di2 < grid.length && currentPosition[1]+dj2 >= 0 && currentPosition[1]+dj2 < grid.length){
+          neighbor = grid[currentPosition[0]+di2][currentPosition[1]+dj2];
+        }
         
         int di3 = neighborRelativeIndecies[mod(n+1,6)][0];
         int dj3 = neighborRelativeIndecies[mod(n+1,6)][1];
-        Bug neighborsLeftNeighbor = grid[currentPosition[0]+di3][currentPosition[1]+dj3];
+        Bug neighborsLeftNeighbor = null;
+        if (currentPosition[0]+di3 >= 0 && currentPosition[0]+di3 < grid.length && currentPosition[1]+dj3 >= 0 && currentPosition[1]+dj3 < grid.length){
+          neighborsLeftNeighbor = grid[currentPosition[0]+di3][currentPosition[1]+dj3];
+        }
         
         // DEBUG TOOL
-        //println(" checking n =", n);
-        //if (neighborsRightNeighbor != null){
-        //  println("    right  ", currentPosition[0]+di, currentPosition[1]+dj, neighborsRightNeighbor.name);
-        //} else {
-        //  println("    right  ", currentPosition[0]+di, currentPosition[1]+dj, "null");
-        //}
+        println(" checking n =", n);
+        if (neighborsRightNeighbor != null){
+          println("    right  ", currentPosition[0]+di, currentPosition[1]+dj, neighborsRightNeighbor.name);
+        } else {
+          println("    right  ", currentPosition[0]+di, currentPosition[1]+dj, "null");
+        }
         
-        //if (neighbor != null){
-        //  println("    middle ", currentPosition[0]+di2, currentPosition[1]+dj2, neighbor.name);
-        //} else {
-        //  println("    middle ", currentPosition[0]+di2, currentPosition[1]+dj2, "null");
-        //}
+        if (neighbor != null){
+          println("    middle ", currentPosition[0]+di2, currentPosition[1]+dj2, neighbor.name);
+        } else {
+          println("    middle ", currentPosition[0]+di2, currentPosition[1]+dj2, "null");
+        }
         
-        //if (neighborsLeftNeighbor != null){
-        //  println("    left   ", currentPosition[0]+di3, currentPosition[1]+dj3, neighborsLeftNeighbor.name);
-        //} else {
-        //  println("    left   ", currentPosition[0]+di3, currentPosition[1]+dj3, "null");
-        //}
+        if (neighborsLeftNeighbor != null){
+          println("    left   ", currentPosition[0]+di3, currentPosition[1]+dj3, neighborsLeftNeighbor.name);
+        } else {
+          println("    left   ", currentPosition[0]+di3, currentPosition[1]+dj3, "null");
+        }
         
         // Check if neighbor is valid (empty, corresponding sides have exactly one neighbor, and not already in moves)
         if (neighbor == null && xor(neighborsLeftNeighbor == null, neighborsRightNeighbor == null)){
           int[] potentialMove = {currentPosition[0]+di2, currentPosition[1]+dj2};
           println("POTENTIAL MOVE FOUND", potentialMove[0], potentialMove[1]);
-          if (!indeciesInArray(potentialMove, moves)){
+          if (!indeciesInArray(potentialMove, moves) && !(potentialMove[0] == i && potentialMove[1] == j)){
+            println("VALID MOVE FOUND", potentialMove[0], potentialMove[1]);
             validMove = potentialMove;
           }
         }
       }
       
       if (validMove != null){
+        println("VALID MOVE TO ADD", validMove[0], validMove[1]);
+        
         // Add valid move to the list of moves
         int[][] tempMoves = new int[moves.length+1][2];
         for (int m = 0; m < moves.length; m++){
