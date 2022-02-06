@@ -58,6 +58,21 @@ class Game {
       }
     }
     
+    // Show move tiles
+    if (currentBugValidMoves != null){
+      tint(250, 200, 50);
+      for (int m = 0; m < currentBugValidMoves.length; m++){
+        PVector Q = new PVector(1, 0).mult(this.scale);
+        PVector R = new PVector(0.5, -sqrt(3)/2).mult(this.scale);
+        PImage emptyTile = loadImage("bugs/empty.png");
+        emptyTile.resize(0, int(this.scale));
+        int i = currentBugValidMoves[m][0];
+        int j = currentBugValidMoves[m][1];
+        image(emptyTile, Q.x * (i-this.offset) + R.x * (j-this.offset) + this.center.x, Q.y * (i-this.offset) + R.y * (j-this.offset) + this.center.y);
+      }
+      noTint();
+    }
+    
     // Show player menu
     fill(120, 110, 100);
     rect(0, 0, width, 130);
@@ -240,6 +255,7 @@ class Game {
       // Check for menu highlight change
       if (mouseY < 120){
         this.currentBug = null;
+        this.currentBugValidMoves = null;
         if (dist(mouseX, mouseY, 40, 90) < 30){
           this.menuHighlightPosition = new PVector(40, 90);
           this.menuHighlightBug = "queen";
@@ -302,6 +318,7 @@ class Game {
           //Check if a bug owned by the current player is being selected
           if (this.grid[i][j].team == this.players[this.playerTurn].team){
             this.currentBug = new int[] {i, j};
+            this.currentBugValidMoves = null;
             this.menuHighlightPosition = new PVector(-50, -50);
             
             println(grid[i][j].name);
