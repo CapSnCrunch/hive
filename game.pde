@@ -336,6 +336,29 @@ class Game {
     }
   }
   
+  
+    
+    
+  boolean gridIsConnected(Bug[][] grid){
+    // check if every bug has a neighbor (doesn't work since their could be multiple in the disconnected set)
+    // Breadth First Search
+    //  Start at any bug and add position to a queue
+    //  While i < queue.length;
+    //   Get neigbors of queue[i]
+    //   If !indeciesInArray(index, queue) add their positions to the queue
+    //   i += 1
+    
+    
+    return true;
+  }
+  
+  boolean bugIsBlocked(int i, int j){
+    // Pseudocode:
+    //   Make temp grid without bug at i, j
+    //   Check if temp grid is connected
+    return true;
+  }
+  
   int[][] getAntMoves(int i, int j){
     int[][] moves = new int[0][0];
     int[] currentPosition = {i, j};
